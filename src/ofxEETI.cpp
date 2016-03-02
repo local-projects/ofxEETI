@@ -164,7 +164,7 @@ bool ofxEETI::initEETI(bool bMandatoryInit)
 	usleep(200000);
 	serial.flush();
 	
-	unsigned char buff[1024];	// should be more than enough
+	unsigned char buff[BUFFER_SIZE];	// should be more than enough
 	
 	// send alive message
 	serial.writeBytes(eeti_alive, 3);
@@ -174,8 +174,9 @@ bool ofxEETI::initEETI(bool bMandatoryInit)
             return false;
         }
 	}
-	
-	int count = serial.available();
+
+	memset(buff, 0, BUFFER_SIZE);
+	int count = min(serial.available(), BUFFER_SIZE);
 	serial.readBytes(buff, count);
 #ifdef DEBUG_SERIAL
 	printf("eeti_alive response: ");
@@ -199,7 +200,8 @@ bool ofxEETI::initEETI(bool bMandatoryInit)
 	}
 	
 	usleep(50000);
-	count = serial.available();
+	memset(buff, 0, BUFFER_SIZE);
+	count = max(serial.available(), BUFFER_SIZE);
 	serial.readBytes(buff, count);
 #ifdef DEBUG_SERIAL
 	printf("eeti_fwver response: ");
@@ -221,7 +223,8 @@ bool ofxEETI::initEETI(bool bMandatoryInit)
 	}
 	
 	usleep(50000);
-	count = serial.available();
+	memset(buff, 0, BUFFER_SIZE);
+	count = max(serial.available(), BUFFER_SIZE);
 	serial.readBytes(buff, count);
 #ifdef DEBUG_SERIAL
 	printf("eeti_ctrlr response: ");
@@ -255,7 +258,7 @@ int ofxEETI::waitForResponse(int nBytes, unsigned int timeout_ms)
 
 void ofxEETI::threadFunction()
 {
-	unsigned char buff[1024];
+	unsigned char buff[BUFFER_SIZE];
 	
 	while (bRunning) {
 		while (serial.available() >= 6) {

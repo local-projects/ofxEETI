@@ -19,6 +19,7 @@
 #endif
 
 #define MAX_TOUCH 10
+#define BUFFER_SIZE	16*1024
 
 class ofxEETI
 {
