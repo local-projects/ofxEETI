@@ -161,7 +161,7 @@ void ofxEETI::abortCalibration()
 
 bool ofxEETI::initEETI(bool bMandatoryInit)
 {
-	usleep(200000);
+	ofSleepMillis(500);
 	serial.flush();
 	
 	unsigned char buff[BUFFER_SIZE];	// should be more than enough
@@ -198,11 +198,12 @@ bool ofxEETI::initEETI(bool bMandatoryInit)
             return false;
         }
 	}
-	
-	usleep(50000);
+
+	ofSleepMillis(150);
 	memset(buff, 0, BUFFER_SIZE);
-	count = max(serial.available(), BUFFER_SIZE);
-	serial.readBytes(buff, count);
+	count = max(serial.available(), BUFFER_SIZE-2);
+	count = serial.readBytes(buff, count);
+	buff[count] = 0;
 #ifdef DEBUG_SERIAL
 	printf("eeti_fwver response: ");
 	printBuffer(buff, count);
@@ -221,11 +222,12 @@ bool ofxEETI::initEETI(bool bMandatoryInit)
             return false;
         }
 	}
-	
-	usleep(50000);
+
+	ofSleepMillis(150);
 	memset(buff, 0, BUFFER_SIZE);
-	count = max(serial.available(), BUFFER_SIZE);
-	serial.readBytes(buff, count);
+	count = max(serial.available(), BUFFER_SIZE-2);
+	count = serial.readBytes(buff, count);
+	buff[count] = 0;
 #ifdef DEBUG_SERIAL
 	printf("eeti_ctrlr response: ");
 	printBuffer(buff, count);
@@ -245,7 +247,7 @@ int ofxEETI::waitForResponse(int nBytes, unsigned int timeout_ms)
 	int timeout=timeout_ms;
 	int bytes;
 	while ((bytes = serial.available())<nBytes && timeout-->0) {
-		usleep(1000);
+		ofSleepMillis(1);
 	}
 	
 	if (timeout==0) {
